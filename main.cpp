@@ -6,12 +6,11 @@ using namespace std;
 class DataManager {
  private:
   int* data;
-  int size;
 
  public:
-  DataManager(int s) {
-    size = s;
-    data = new int[size];
+  DataManager() { // no need for s here
+    // no initilization need to init with s
+    data = new int[5]; // can't allocate in stack as size unknown at compile time
 
     for (int i = 0; i < size; i++) {
       if (i % 2 == 0) data[i] = i * 2;
@@ -31,13 +30,13 @@ class DataManager {
     return data[0];
   }
 
-  ~DataManager() { delete data; }
+  ~DataManager() { delete[] data; } // data is a pointer to array so delete
 };
 
 void unsafeFunction() {
-  char buffer[10];
+  char buffer[100];
 
-  strcpy(buffer, "This is way too long for buffer");
+  strcpy(buffer, "This is way too long for buffer"); // the buffer was too short
 
   cout << buffer << endl;
 }
@@ -45,14 +44,13 @@ void unsafeFunction() {
 int globalVar = 0;
 
 int compute(int x) {
-  int result;
 
   if (x > 10)
-    result = x * 2;
+    return x * 2; // if get here the result is unused so no need for it 
   else if (x < 0)
-    return result;
+    return x; // no initilzation to result here
 
-  return result;
+  return x; // same as above 
 }
 
 void memoryLeakDemo() {
@@ -62,7 +60,10 @@ void memoryLeakDemo() {
   leak1[0] = 10;
   *leak2 = 20;
 
-  cout << leak1[0] + *leak2 << endl;
+  cout << leak1[0] + *leak2 << endl;  
+  // memory leak no delete 
+  delete [] leak1;delete leak2;
+
 }
 
 void vectorIssues() {
@@ -78,7 +79,7 @@ void vectorIssues() {
 }
 
 int main() {
-  DataManager dm(5);
+  DataManager dm();
 
   dm.print();
 
